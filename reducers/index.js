@@ -1,6 +1,6 @@
-import { RECEIVE_ALL_DECKS, ADD_DECK } from '../actions'
+import { RECEIVE_ALL_DECKS, ADD_DECK, ADD_CARD } from '../actions'
 
-function deckEntries(state=null, action) {
+function deckReducer(state=null, action) {
   switch (action.type) {
     case RECEIVE_ALL_DECKS:
       return {
@@ -12,9 +12,16 @@ function deckEntries(state=null, action) {
         ...state,
         ...action.deck // merge action.entry onto state
       }
+    case ADD_CARD:
+      const updatedDeck = state[action.deck.id];
+      updatedDeck.questions.push(action.card);
+      return {
+        ...state,
+        [action.deck.id]: updatedDeck
+      }
     default:
       return state
   }
 }
 
-export default deckEntries
+export default deckReducer

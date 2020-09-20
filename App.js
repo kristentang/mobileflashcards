@@ -8,25 +8,25 @@ import {
   SafeAreaView,
   StatusBar
 } from 'react-native';
-import { Provider as PaperProvider } from "react-native-paper";
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';import { Provider as PaperProvider } from "react-native-paper";
 import { createAppContainer } from 'react-navigation'
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createStackNavigator } from 'react-navigation-stack';
-import Constants from 'expo-constants'
-import { purple, white } from './utils/colors'
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import { connect } from 'react-redux'
 import thunk from 'redux-thunk';
 import logger from 'redux-logger';
 
+import { deleteAllDecks, getDecks } from './utils/api'
+import reducer from './reducers'
+
 import DeckList from './components/DeckList'
 import Deck from './components/Deck'
 import NewDeck from './components/NewDeck'
 import NewQuestion from './components/NewQuestion'
 import QuizView from './components/QuizView'
-import { deleteAllDecks, getDecks } from './utils/api'
-import reducer from './reducers'
+
 
 const store = createStore(
   reducer,
@@ -45,32 +45,87 @@ const Tabs = createAppContainer(createBottomTabNavigator({
   DeckList: {
       screen: DeckList,
       navigationOptions: {
-        tabBarLabel: 'All Decks'
+        tabBarLabel: 'All Decks',
+        tabBarIcon: ({ tintColor }) => <MaterialCommunityIcons name="cards" size={36} color={tintColor} />
       }
     },
     NewDeck: {
       screen: NewDeck,
       navigationOptions: {
-        tabBarLabel: 'Add Deck'
+        tabBarLabel: 'Create Deck',
+        tabBarIcon: ({ tintColor }) => <MaterialIcons name="add-box" size={36} color={tintColor} />
       }
     }
   },{
   tabBarOptions: {
-    activeTintColor: Platform.OS === 'ios' ? purple: white,
+    activeTintColor: 'purple',
     style: {
       height: 56,
-      backgroundColor: Platform.OS === 'ios' ? white: purple,
+      backgroundColor: 'white',
       shadowColor: 'rgba(0,0,0,.24)',
       shadowOffset: {
         width: 0,
         height: 3
       },
       shadowRadius: 6,
-      shadowOpacity: 1
+      shadowOpacity: 1,
+      padding: 5
+    },
+    labelStyle: {
+      fontSize: 12
     }
   }
 }
 ));
+
+const MainNavigator = createAppContainer(createStackNavigator({
+  Home: {
+    screen: Tabs,
+    navigationOptions:  {
+      headerShown: false
+    }
+  },
+  Deck: {
+    screen: Deck,
+    navigationOptions: ({ navigation }) => ({
+      title: 'My Deck',
+      headerTintColor: 'white',
+      headerStyle: {
+        backgroundColor: 'purple'
+      }
+    })
+  },
+  DeckList: {
+    screen: DeckList,
+    navigationOptions: ({ navigation }) => ({
+      title: 'All Decks',
+      headerTintColor: 'white',
+      headerStyle: {
+        backgroundColor: 'purple'
+      }
+    })
+  },
+  NewQuestion: {
+    screen: NewQuestion,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Add Question',
+      headerTintColor: 'white',
+      headerStyle: {
+        backgroundColor: 'purple'
+      }
+    })
+  },
+  QuizView: {
+    screen: QuizView,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Quiz',
+      headerTintColor: 'white',
+      headerStyle: {
+        backgroundColor: 'purple'
+      }
+    })
+  }
+}))
 
 export default class App extends Component {
 
@@ -78,9 +133,8 @@ export default class App extends Component {
     return (
       <Provider store={store}>
         <View style={{flex: 1}}>
-          <UdaciStatusBar backgroundColor={purple} barStyle='light-content' />
-          <Text>MOBILE FLASHCARDS APP</Text>
-          <Tabs />
+          <UdaciStatusBar backgroundColor={'purple'} barStyle='light-content' />
+          <MainNavigator />
         </View>
       </Provider>
     );
